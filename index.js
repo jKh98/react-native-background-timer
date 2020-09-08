@@ -13,6 +13,7 @@ class BackgroundTimer {
   constructor() {
     this.uniqueId = 0;
     this.callbacks = {};
+    this.bool = true;
 
     Emitter.addListener('backgroundTimer.timeout', (id) => {
       if (this.callbacks[id]) {
@@ -43,6 +44,7 @@ class BackgroundTimer {
       android: () => DeviceEventEmitter,
     })();
     this.start(0);
+    this.bool = true;
     this.backgroundListener = EventEmitter.addListener(
       'backgroundTimer',
       () => {
@@ -54,12 +56,15 @@ class BackgroundTimer {
 
   backgroundClockMethod(callback, delay) {
     this.backgroundTimer = this.setTimeout(() => {
-      callback();
-      this.backgroundClockMethod(callback, delay);
+      if (this.bool) {
+        callback();
+        this.backgroundClockMethod(callback, delay);
+      }
     }, delay);
   }
 
   stopBackgroundTimer() {
+    this.bool = false;
     this.stop();
     this.clearTimeout(this.backgroundTimer);
   }
